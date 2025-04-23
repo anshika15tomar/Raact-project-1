@@ -3,6 +3,7 @@ import React, { useState } from "react";
 function App() {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
+  const [editIndex, setEditIndex] = useState(null); 
 
   const addTask = () => {
     if (input.trim() === "") return;
@@ -13,15 +14,21 @@ function App() {
   const deleteTask = (index) => {
     const updatedTasks = tasks.filter((_, i) => i !== index);
     setTasks(updatedTasks);
+    // if (editIndex === index) setEditIndex(null);
   };
 
-  const editTask = (index) => {
-    const newTask = prompt("Update your task:", tasks[index]);
-    if (newTask !== null && newTask.trim() !== "") {
-      const updatedTasks = [...tasks];
-      updatedTasks[index] = newTask.trim();
-      setTasks(updatedTasks);
-    }
+  const startEditTask = (index) => {
+    setEditIndex(index);
+    setInput(tasks[index]);
+  };
+
+  const saveEditTask = () => {
+    if (input.trim() === "") return;
+    const updatedTasks = [...tasks];
+    updatedTasks[editIndex] = input;
+    setTasks(updatedTasks);
+    setEditIndex(null);
+    setInput("");
   };
 
   return (
@@ -36,14 +43,31 @@ function App() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Enter a task"
         />
-        <button style={styles.addBtn} onClick={addTask}>Add</button>
+        {editIndex !== null ? (
+          <button style={styles.addBtn} onClick={saveEditTask}>Update</button>
+        ) : (
+          <button style={styles.addBtn} onClick={addTask}>Add</button>
+        )}
       </div>
 
       {tasks.map((task, index) => (
         <div key={index} style={styles.task}>
-          <span>{task}</span>
+          {editIndex === index ? (
+            <input
+              style={styles.input}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+          ) : (
+            <span>{task}</span>
+          )}
           <div>
-            <button style={styles.editBtn} onClick={() => editTask(index)}>Edit</button>
+            {editIndex === index ? (
+              <button style={styles.editBtn} onClick={saveEditTask}>Save</button>
+            ) : (
+              <button style={styles.editBtn} onClick={() => startEditTask(index)}>Edit</button>
+            )}
             <button style={styles.deleteBtn} onClick={() => deleteTask(index)}>Delete</button>
           </div>
         </div>
@@ -53,7 +77,6 @@ function App() {
 }
 
 const styles = {
-  
   container: {
     maxWidth: "400px",
     width: "100%",
@@ -67,10 +90,6 @@ const styles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
   },
-  h2:{
-    color :"pink",
-  },
-  
   inputRow: {
     display: "flex",
     gap: "10px",
@@ -80,7 +99,6 @@ const styles = {
     padding: "10px",
     borderRadius: "5px",
     border: "1px solid #ddd",
-   
   },
   addBtn: {
     padding: "10px",
@@ -120,4 +138,3 @@ const styles = {
 };
 
 export default App;
-
