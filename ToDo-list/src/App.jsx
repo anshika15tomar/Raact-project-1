@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState , useRef } from "react";
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
   const [editIndex, setEditIndex] = useState(null); 
+  const inputRef = useRef(null);
+
 
   const addTask = () => {
     if (input.trim() === "") return;
@@ -14,12 +16,13 @@ function App() {
   const deleteTask = (index) => {
     const updatedTasks = tasks.filter((_, i) => i !== index);
     setTasks(updatedTasks);
-    // if (editIndex === index) setEditIndex(null);
+  
   };
 
   const startEditTask = (index) => {
     setEditIndex(index);
     setInput(tasks[index]);
+    setTimeout(() => inputRef.current?.focus(), 0);
   };
 
   const saveEditTask = () => {
@@ -37,6 +40,7 @@ function App() {
 
       <div style={styles.inputRow}>
         <input
+          ref={inputRef}
           style={styles.input}
           type="text"
           value={input}
@@ -52,16 +56,9 @@ function App() {
 
       {tasks.map((task, index) => (
         <div key={index} style={styles.task}>
-          {editIndex === index ? (
-            <input
-              style={styles.input}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-          ) : (
-            <span>{task}</span>
-          )}
+          
+          <span>{task}</span>
+          
           <div>
             {editIndex === index ? (
               <button style={styles.editBtn} onClick={saveEditTask}>Save</button>
